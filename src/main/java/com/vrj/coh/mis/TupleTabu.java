@@ -1,5 +1,7 @@
 package com.vrj.coh.mis;
 
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +26,11 @@ public class TupleTabu {
         TupleTabu otherTuple = (TupleTabu) obj;
 
         return this.set.equals(otherTuple.set);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(set);
     }
 
 }
