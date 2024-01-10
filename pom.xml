@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.vrj.coh</groupId>
 	<artifactId>mis</artifactId>
@@ -23,12 +24,6 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.28</version>
 			<scope>provided</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/guru.nidi/graphviz-java -->
-		<dependency>
-			<groupId>guru.nidi</groupId>
-			<artifactId>graphviz-java</artifactId>
-			<version>0.18.1</version>
 		</dependency>
 	</dependencies>
 	<build>
