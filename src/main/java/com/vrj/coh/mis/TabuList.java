@@ -1,9 +1,9 @@
 package com.vrj.coh.mis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 import lombok.Data;
 
@@ -12,8 +12,8 @@ import lombok.Data;
  */
 @Data
 public class TabuList {
-    private Queue<String> tabuList;
-    private Map<String, Double> tabuSet;
+    private Queue<TupleTabu> tabuList;
+    private Set<TupleTabu> tabuSet;
     private int sizeTabuList;
 
     /**
@@ -23,36 +23,20 @@ public class TabuList {
     public TabuList(int sizeTabuList) {
         this.sizeTabuList = sizeTabuList;
         this.tabuList = new LinkedList<>();
-        this.tabuSet = new HashMap<>();
-    }
-
-    /**
-     * Gets the size of the Tabu List.
-     * @return The size of the Tabu List.
-     */
-    public int getSizeTabuList() {
-        return sizeTabuList;
-    }
-
-    /**
-     * Sets the size of the Tabu List.
-     * @param sizeTabuList The size of the Tabu List to set.
-     */
-    public void setSizeTabuList(int sizeTabuList) {
-        this.sizeTabuList = sizeTabuList;
+        this.tabuSet = new HashSet<>();
     }
 
     /**
      * Adds a solution to the Tabu List.
      * @param solution The solution to add.
      */
-    public void add(String solution, Double feromone) {
+    public void add(TupleTabu solution) {
         if (tabuList.size() == sizeTabuList) {
-            String removed = tabuList.remove();
+            TupleTabu removed = tabuList.remove();
             tabuSet.remove(removed);
         }
         tabuList.add(solution);
-        tabuSet.put(solution, feromone);
+        tabuSet.add(solution);
     }
 
     /**
@@ -60,7 +44,7 @@ public class TabuList {
      * @param solution The solution to check.
      * @return True if the solution is in the Tabu List, false otherwise.
      */
-    public boolean contains(String solution) {
-        return tabuSet.containsKey(solution);
+    public boolean contains(TupleTabu solution) {
+        return tabuSet.contains(solution);
     }
 }
