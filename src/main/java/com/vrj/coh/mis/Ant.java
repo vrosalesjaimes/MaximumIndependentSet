@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 public class Ant {
     private TabuList memory;
-    private double pheromone;
-
-    public double pheromoneQuantity(int r, int s){
-        return 0;
+    
+    
+    public Ant(int sizeTabuList) {
+        this.memory = new TabuList(sizeTabuList);
     }
 }

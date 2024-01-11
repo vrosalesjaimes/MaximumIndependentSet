@@ -9,9 +9,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TupleTabu {
+public class TupleTabu implements Comparable<TupleTabu> {
     private String set;
     private double pheromone;
+    private double cost;
 
     @Override
     public boolean equals(Object obj) {
@@ -31,6 +32,23 @@ public class TupleTabu {
     @Override
     public int hashCode() {
         return Objects.hash(set);
+    }
+
+    public int[] toArray(){
+        String str = set.replaceAll("\\[|\\]|\\s", "");
+        String[] tokens = str.split(",");
+
+        int[]  vertex = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+            vertex[i] = Integer.parseInt(tokens[i]);
+        }
+
+        return vertex;
+    }
+
+    @Override
+    public int compareTo(TupleTabu other) {
+        return Double.compare(other.cost, this.cost);
     }
 
 }

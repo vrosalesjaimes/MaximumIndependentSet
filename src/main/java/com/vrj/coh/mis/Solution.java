@@ -1,5 +1,6 @@
 package com.vrj.coh.mis;
 
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class Solution {
     private static Random random;
-    private static double cost = 0;
+    private double cost = 0;
     private static int numEdges = 0;
     private static int indexOut;
     private static int indexIn;
@@ -19,16 +20,16 @@ public class Solution {
     private int[] indicesVertices;
     private Set<Integer> independentSet;
 
-    public Solution(Graph graph, int[] indicesVertices, Set<Integer> independentSet, int seed) {
+    public Solution(Graph graph, int[] indicesVertices, int seed) {
         this.graph = graph;
         this.indicesVertices = indicesVertices;
-        this.independentSet = independentSet;
+        this.independentSet = arrayToSet(indicesVertices);
         random = new Random(seed);
         numEdges();
         costFunction();
     }
 
-    public void replace(){
+    public void neighbor(){
         int aux = random.nextInt(indicesVertices.length);
         indexOut = indicesVertices[aux];
         indexIn = random.nextInt(graph.getNumVertex());
@@ -73,5 +74,13 @@ public class Solution {
             }
         }
         numEdges = n;
+    }
+
+    private Set<Integer> arrayToSet(int[] array){
+        Set<Integer> set = new HashSet<Integer>();
+        for(int i = 0; i < array.length; i++){
+            set.add(array[i]);
+        }
+        return set;
     }
 }

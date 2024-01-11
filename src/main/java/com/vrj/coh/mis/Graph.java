@@ -1,7 +1,7 @@
 
 package com.vrj.coh.mis;
 
-import java.util.List;
+import java.util.Set;
 
 import lombok.Data;
 
@@ -18,7 +18,7 @@ public class Graph {
         this.numEdges = decoder.getNumEdges();
     }
 
-    public String toString(List<Integer> vertexSet){
+    public String toString(Set<Integer> vertexSet){
         StringBuilder dot = new StringBuilder();
         dot.append("graph G {\n");
 

@@ -1,7 +1,11 @@
 package com.vrj.coh.mis;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -11,7 +15,7 @@ import lombok.Data;
  * This class represents a Tabu List.
  */
 @Data
-public class TabuList {
+public class TabuList implements Iterable<TupleTabu>{
     private Queue<TupleTabu> tabuList;
     private Set<TupleTabu> tabuSet;
     private int sizeTabuList;
@@ -39,6 +43,11 @@ public class TabuList {
         tabuSet.add(solution);
     }
 
+    public void remove(TupleTabu solution) {
+        tabuList.remove(solution);
+        tabuSet.remove(solution);
+    }
+
     /**
      * Checks if the Tabu List contains a solution.
      * @param solution The solution to check.
@@ -46,5 +55,17 @@ public class TabuList {
      */
     public boolean contains(TupleTabu solution) {
         return tabuSet.contains(solution);
+    }
+
+    @Override
+    public Iterator<TupleTabu> iterator() {
+        return tabuList.iterator();
+    }
+
+    public void sort() {
+        List<TupleTabu> listTabu = new ArrayList<>(tabuList);
+        Collections.sort(listTabu);
+        Queue<TupleTabu> sortList = new LinkedList<>(listTabu);
+        this.tabuList = sortList;
     }
 }
