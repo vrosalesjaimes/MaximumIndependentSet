@@ -17,10 +17,10 @@ public class Solution {
     private static int indexIn;
     private int seed;
     private Graph graph; 
-    private int[] indicesVertices;
+    private Integer[] indicesVertices;
     private Set<Integer> independentSet;
 
-    public Solution(Graph graph, int[] indicesVertices, int seed) {
+    public Solution(Graph graph, Integer[] indicesVertices, int seed) {
         this.graph = graph;
         this.indicesVertices = indicesVertices;
         this.independentSet = arrayToSet(indicesVertices);
@@ -63,7 +63,7 @@ public class Solution {
         numEdges = n;
     }
 
-    private Set<Integer> arrayToSet(int[] array){
+    private Set<Integer> arrayToSet(Integer[] array){
         Set<Integer> set = new HashSet<Integer>();
         for(int i = 0; i < array.length; i++){
             set.add(array[i]);

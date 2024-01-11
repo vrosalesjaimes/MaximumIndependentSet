@@ -1,22 +1,24 @@
 package com.vrj.coh.mis;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
+
 
 public class AntColony {
     private static int NUM_ANTS;
     private static int SEED;
     private static int NUM_VERTICES;
-    private static TabuList finalRoute = new TabuList(100000);
+    private static TabuList finalRoute = new TabuList(1000000);
     private static Graph graph;
-    private static Random random = new Random(SEED);
-    private static int NUM_ITERATIONS = 100000;
-    private static int NUM_REPEATS = 5;
+    private static Random random;
+    private static int NUM_ITERATIONS = 500000;
+    private static int NUM_REPEATS = 10;
     private static Ant[] colony;
 
     public static void getColony() {
@@ -29,7 +31,7 @@ public class AntColony {
         colony = colonyArray;
     }
 
-    public static void antRoute(Ant ant, int seed, int iterations, int[] initialSet) {
+    public static void antRoute(Ant ant, int seed, int iterations, Integer[] initialSet) {
         Solution solution = new Solution(graph, initialSet, seed);
         for (int i = 0; i < iterations; i++) {
             solution.neighbor();
@@ -39,19 +41,21 @@ public class AntColony {
 
             if (!ant.getMemory().contains(tuple)) {
                 ant.getMemory().add(tuple);
+            }else{
+                i--;
             }
         }
 
     }
 
-    public static int[] initialSet(int seed) {
-        int[] initialSet = new int[NUM_VERTICES];
+    public static Integer[] initialSet(int seed) {
         Random random = new Random(seed);
+        Set<Integer> set = new HashSet<>(NUM_VERTICES);
 
-        for (int i = 0; i < NUM_VERTICES; i++) {
-            initialSet[i] = random.nextInt(NUM_VERTICES);
+        while(set.size() < NUM_VERTICES) {
+            set.add(random.nextInt(NUM_VERTICES));
         }
-        return initialSet;
+        return set.toArray(new Integer[0]);
     }
 
     public static void updatePheromone() {
@@ -61,11 +65,9 @@ public class AntColony {
             TupleTabu tuple = iterator.next();
 
             if (tuple.getPheromone() < 0.99) {
-                tuple.setPheromone(tuple.getPheromone() * (9 / 10));
-            }
-
-            if (tuple.getPheromone() < 0.5) {
-                iterator.remove(); // Usa el iterador para eliminar el elemento
+                tuple.setPheromone(tuple.getPheromone()*(99/100));
+            } else {
+                tuple.setPheromone(Math.sqrt(tuple.getPheromone()));
             }
         }
     }
@@ -74,7 +76,7 @@ public class AntColony {
         for (Ant ant : colony) {
             for (TupleTabu tuple : ant.getMemory()) {
                 if (!finalRoute.contains(tuple)) {
-                    if (tuple.getPheromone() > .5) {
+                    if (tuple.getPheromone() >= .9) {
                         finalRoute.add(tuple);
                     }
                 }
@@ -83,11 +85,10 @@ public class AntColony {
     }
 
     public static void optimizationAntColony() {
-        int seed = random.nextInt();
-
         for (int i = 0; i < NUM_REPEATS; i++) {
             for (Ant ant : colony) {
-                int[] initialSet = initialSet(seed);
+                int seed = random.nextInt();
+                Integer[] initialSet = initialSet(seed);
                 antRoute(ant, seed, NUM_ITERATIONS / NUM_ANTS, initialSet);
             }
             updateFinalRoute();
@@ -95,26 +96,41 @@ public class AntColony {
         }
     }
 
-    private static String readFile(String nameFile) throws IOException {
-        File file = new File(nameFile);
-
-        if (!file.exists()) {
-            throw new IOException("File not found");
-        }
-
-        try (FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-
-            StringBuilder stringBuilder = new StringBuilder();
+    private static Graph readFile(String filePath) throws IOException {
+        try  {
+            BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
+            int numVertices = 0;
+            int numAristas = 0;
+    
+            while ((line = br.readLine()) != null) {
+                numVertices++;
             }
-
-            return stringBuilder.toString();
+    
+            int[][] matrix = new int[numVertices][numVertices];
+            
+            br.close();
+            br = new BufferedReader(new FileReader(filePath));
+            
+            int i = 0;
+    
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(" ");
+                for (int j = 0; j < values.length; j++) {
+                    matrix[i][j] = Integer.parseInt(values[j]);
+                    numAristas += Integer.parseInt(values[j]);
+                }
+                i++;
+            }
+            
+            return new Graph(matrix, numVertices, numAristas / 2); 
+    
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
-
+    
     public static void main(String[] args) throws IOException {
         if (args.length != 4) {
             System.out.println("Usage: java -jar target/*.jar <graph_document> <numAnts> <seed> <numVertices>");
@@ -124,23 +140,9 @@ public class AntColony {
         NUM_ANTS = Integer.parseInt(args[1]);
         SEED = Integer.parseInt(args[2]);
         NUM_VERTICES = Integer.parseInt(args[3]);
-        String graphFile = readFile(args[0]);
-
+        graph = readFile(args[0]);
+        random = new Random(SEED);
         getColony();
-
-        int[][] adjacencyMatrix = {
-                { 0, 1, 0, 0, 0, 1, 0, 0, 0, 1 },
-                { 1, 0, 1, 0, 0, 0, 1, 0, 0, 0 },
-                { 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 },
-                { 0, 0, 1, 0, 1, 0, 0, 0, 1, 0 },
-                { 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
-                { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-                { 0, 1, 0, 0, 0, 1, 0, 1, 0, 0 },
-                { 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 },
-                { 0, 0, 0, 1, 0, 0, 0, 1, 0, 1 },
-                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0 }
-        };
-        graph = new Graph(adjacencyMatrix, 10, 15);
 
         optimizationAntColony();
 
@@ -153,6 +155,6 @@ public class AntColony {
 
         TupleTabu bestSolution = finalRoute.getTabuList().peek();
 
-        System.out.println(bestSolution.getCost() == 1);
+        System.out.println((bestSolution.getCost() == 1) + ", " + bestSolution.getCost());
     }
 }
