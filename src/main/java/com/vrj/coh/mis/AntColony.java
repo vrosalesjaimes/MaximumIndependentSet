@@ -5,35 +5,34 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 public class AntColony {
     private static int NUM_ANTS;
     private static int SEED;
     private static int NUM_VERTICES;
-    private static TabuList finalRoute = new TabuList(1000);
+    private static TabuList finalRoute = new TabuList(100000);
     private static Graph graph;
     private static Random random = new Random(SEED);
     private static int NUM_ITERATIONS = 100000;
-    private static int NUM_REPEATS = 10;
-    private static Ant[] colony = getColony();
+    private static int NUM_REPEATS = 5;
+    private static Ant[] colony;
 
-    public static Ant[] getColony() {
-        Ant[] colony = new Ant[NUM_ANTS];
+    public static void getColony() {
+        Ant[] colonyArray = new Ant[NUM_ANTS];
 
         for (int i = 0; i < NUM_ANTS; i++) {
-            colony[i] = new Ant(NUM_ITERATIONS / NUM_ANTS);
+            colonyArray[i] = new Ant(NUM_ITERATIONS / NUM_ANTS);
         }
 
-        return colony;
+        colony = colonyArray;
     }
 
     public static void antRoute(Ant ant, int seed, int iterations, int[] initialSet) {
         Solution solution = new Solution(graph, initialSet, seed);
-
         for (int i = 0; i < iterations; i++) {
             solution.neighbor();
-
             String sol = Arrays.toString(solution.getIndicesVertices());
 
             TupleTabu tuple = new TupleTabu(sol, solution.getCost(), solution.getCost());
@@ -56,13 +55,17 @@ public class AntColony {
     }
 
     public static void updatePheromone() {
-        for (TupleTabu tuple : finalRoute) {
-            if (tuple.getPheromone() < .99) {
-                tuple.setPheromone(tuple.getPheromone() / 2);
+        Iterator<TupleTabu> iterator = finalRoute.iterator();
+
+        while (iterator.hasNext()) {
+            TupleTabu tuple = iterator.next();
+
+            if (tuple.getPheromone() < 0.99) {
+                tuple.setPheromone(tuple.getPheromone() * (9 / 10));
             }
 
-            if (tuple.getPheromone() < .8) {
-                finalRoute.remove(tuple);
+            if (tuple.getPheromone() < 0.5) {
+                iterator.remove(); // Usa el iterador para eliminar el elemento
             }
         }
     }
@@ -71,7 +74,7 @@ public class AntColony {
         for (Ant ant : colony) {
             for (TupleTabu tuple : ant.getMemory()) {
                 if (!finalRoute.contains(tuple)) {
-                    if (tuple.getPheromone() > .8) {
+                    if (tuple.getPheromone() > .5) {
                         finalRoute.add(tuple);
                     }
                 }
@@ -80,8 +83,9 @@ public class AntColony {
     }
 
     public static void optimizationAntColony() {
+        int seed = random.nextInt();
+
         for (int i = 0; i < NUM_REPEATS; i++) {
-            int seed = random.nextInt();
             for (Ant ant : colony) {
                 int[] initialSet = initialSet(seed);
                 antRoute(ant, seed, NUM_ITERATIONS / NUM_ANTS, initialSet);
@@ -122,11 +126,30 @@ public class AntColony {
         NUM_VERTICES = Integer.parseInt(args[3]);
         String graphFile = readFile(args[0]);
 
-        graph = new Graph(graphFile);
+        getColony();
+
+        int[][] adjacencyMatrix = {
+                { 0, 1, 0, 0, 0, 1, 0, 0, 0, 1 },
+                { 1, 0, 1, 0, 0, 0, 1, 0, 0, 0 },
+                { 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 },
+                { 0, 0, 1, 0, 1, 0, 0, 0, 1, 0 },
+                { 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
+                { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+                { 0, 1, 0, 0, 0, 1, 0, 1, 0, 0 },
+                { 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 },
+                { 0, 0, 0, 1, 0, 0, 0, 1, 0, 1 },
+                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0 }
+        };
+        graph = new Graph(adjacencyMatrix, 10, 15);
 
         optimizationAntColony();
 
         finalRoute.sort();
+
+        if (finalRoute.getTabuList().isEmpty()) {
+            System.out.println("No solution found");
+            System.exit(1);
+        }
 
         TupleTabu bestSolution = finalRoute.getTabuList().peek();
 

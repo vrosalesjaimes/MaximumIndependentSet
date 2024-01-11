@@ -12,7 +12,7 @@ import lombok.Setter;
 public class Solution {
     private static Random random;
     private double cost = 0;
-    private static int numEdges = 0;
+    private int numEdges = 0;
     private static int indexOut;
     private static int indexIn;
     private int seed;
@@ -42,34 +42,21 @@ public class Solution {
         indicesVertices[aux] = indexIn;
         independentSet.remove(indexOut);
         independentSet.add(indexIn);
-        modifyCost();
+        numEdges();
+        costFunction();
     }
 
 
     private void costFunction(){
-        cost = (graph.getNumEdges() - numEdges)/graph.getNumEdges();
-    }
-
-    private void modifyCost(){
-        int n = 0;
-        int m = 0;
-        for(int i = 0; i < indicesVertices.length-1; i++){
-            if(graph.getAdjMatrix()[indexOut][indicesVertices[i]] == 1){
-                n++;
-            }
-                
-            if(graph.getAdjMatrix()[indexIn][indicesVertices[i]] == 1)
-                m++;
-        }
-        cost -= (n/graph.getNumEdges());
-        cost += (m/graph.getNumEdges());
+        double numerador = graph.getNumEdges() - numEdges;
+        cost = numerador/graph.getNumEdges();
     }
 
     private void numEdges(){
         int n = 0;
-        for(int i = 0; i < indicesVertices.length-1; i++){
+        for(int i = 0; i < indicesVertices.length; i++){
             for(int j = 0; j < indicesVertices.length; j++){
-                if(this.graph.getAdjMatrix()[i][j] == 1)
+                if(this.graph.getAdjMatrix()[indicesVertices[i]][indicesVertices[j]] == 1)
                     n++;
             }
         }

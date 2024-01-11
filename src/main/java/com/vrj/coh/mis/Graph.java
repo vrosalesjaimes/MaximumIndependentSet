@@ -18,6 +18,12 @@ public class Graph {
         this.numEdges = decoder.getNumEdges();
     }
 
+    public Graph(int[][] adjMatrix, int numVertex, int numEdges) {
+        this.adjMatrix = adjMatrix;
+        this.numVertex = numVertex;
+        this.numEdges = numEdges;
+    }
+
     public String toString(Set<Integer> vertexSet){
         StringBuilder dot = new StringBuilder();
         dot.append("graph G {\n");
